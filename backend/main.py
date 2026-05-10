@@ -1,19 +1,24 @@
-# main.py
-from fastapi import FastAPI
-from app.api.routes import loan
-from app.api.models import database
+"""Main entry point for the FastAPI application."""
 
-app = FastAPI(title="Bank Loan API")
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.api.routes import loan
+
+app = FastAPI(title="Bank Loan Service API", version="1.0.0")
+
+# CORS settings for Flutter mobile app
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, restrict to specific origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Include routers
-app.include_router(loan.router, prefix="/api/loan", tags=["loan"])
+app.include_router(loan.router, prefix="/api/loan", tags=["Loan"])
 
-# Startup event to create tables
-@app.on_event("startup")
-async def startup():
-    await database.init_models()
-
-# Shutdown event to close DB
-@app.on_event("shutdown")
-async def shutdown():
-    await database.close()
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
