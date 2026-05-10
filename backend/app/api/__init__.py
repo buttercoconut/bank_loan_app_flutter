@@ -1,1 +1,1 @@
-# Empty __init__ to make package
+# API package initialization

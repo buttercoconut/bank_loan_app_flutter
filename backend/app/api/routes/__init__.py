@@ -1,1 +1,2 @@
-# Empty __init__ to make package
+# __init__.py
+# Empty file to mark package

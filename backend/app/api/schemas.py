@@ -1,21 +1,19 @@
+# schemas.py
 from pydantic import BaseModel, Field
-from datetime import datetime
+from datetime import date
 
 class LoanApplicationCreate(BaseModel):
     customer_id: int
-    customer_name: str
     product_id: int
-    product_name: str
+    amount: float
     interest_rate: float
-    amount: float
+    term_months: int
+    created_at: date = Field(default_factory=date.today)
 
-class LoanApplicationResponse(BaseModel):
+class LoanApplicationResponse(LoanApplicationCreate):
     id: int
-    customer_id: int
-    product_id: int
-    amount: float
     status: str
-    applied_at: datetime
+    created_at: date
 
     class Config:
         orm_mode = True
