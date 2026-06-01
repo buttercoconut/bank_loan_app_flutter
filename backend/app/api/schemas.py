@@ -1,19 +1,45 @@
-# schemas.py
-from pydantic import BaseModel, Field
-from datetime import date
+# app/api/schemas.py
+from pydantic import BaseModel, EmailStr
+from typing import Optional
+from datetime import datetime
+
+class CustomerCreate(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+
+class CustomerOut(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+class LoanProductOut(BaseModel):
+    id: int
+    name: str
+    interest_rate: float
+    max_amount: float
+
+    class Config:
+        orm_mode = True
 
 class LoanApplicationCreate(BaseModel):
-    customer_id: int
     product_id: int
     amount: float
-    interest_rate: float
-    term_months: int
-    created_at: date = Field(default_factory=date.today)
+    income: float
+    debt_ratio: float
 
-class LoanApplicationResponse(LoanApplicationCreate):
+class LoanApplicationOut(BaseModel):
     id: int
+    product: LoanProductOut
+    amount: float
+    income: float
+    debt_ratio: float
     status: str
-    created_at: date
+    created_at: datetime
 
     class Config:
         orm_mode = True
