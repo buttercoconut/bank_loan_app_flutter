@@ -1,36 +1,62 @@
-# models/loan.py
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
-from ..database import Base
+# app/api/models/loan.py
+from datetime import datetime
+from typing import List, Optional
+from pydantic import BaseModel, Field
 
-class Customer(Base):
-    __tablename__ = "customers"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    email = Column(String, unique=True, index=True, nullable=False)
-    phone = Column(String, unique=True, index=True, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    loans = relationship("LoanApplication", back_populates="customer")
+class Customer(BaseModel):
+    id: int
+    name: str
+    email: str
+    phone: str
+    ssn: str = Field(..., alias="social_security_number")
 
-class LoanProduct(Base):
-    __tablename__ = "loan_products"
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
-    interest_rate = Column(Float, nullable=False)
-    max_amount = Column(Float, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    applications = relationship("LoanApplication", back_populates="product")
+class LoanProduct(BaseModel):
+    id: int
+    name: str
+    interest_rate: float
+    max_amount: float
+    min_credit_score: int
 
-class LoanApplication(Base):
-    __tablename__ = "loan_applications"
-    id = Column(Integer, primary_key=True, index=True)
-    customer_id = Column(Integer, ForeignKey("customers.id"))
-    product_id = Column(Integer, ForeignKey("loan_products.id"))
-    amount = Column(Float, nullable=False)
-    income = Column(Float, nullable=False)
-    debt_ratio = Column(Float, nullable=False)
-    status = Column(String, default="pending")
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    customer = relationship("Customer", back_populates="loans")
-    product = relationship("LoanProduct", back_populates="applications")
+class RepaymentInfo(BaseModel):
+    id: int
+    loan_application_id: int
+    due_date: datetime
+    amount: float
+    paid: bool
+
+class LoanApplication(BaseModel):
+    id: int
+    customer: Customer
+    product: LoanProduct
+    amount: float
+    income: float
+    debt_ratio: float
+    credit_score: int
+    status: str
+    created_at: datetime
+    repayments: List[RepaymentInfo] = []
+
+# DTOs for requests
+class LoanApplicationCreate(BaseModel):
+    customer_id: int
+    product_id: int
+    amount: float
+    income: float
+    debt_ratio: float
+    credit_score: int
+
+class LoanApplicationUpdate(BaseModel):
+    status: Optional[str] = None
+    amount: Optional[float] = None
+
+class LoanApplicationResponse(BaseModel):
+    id: int
+    status: str
+    amount: float
+    created_at: datetime
+
+class LoanStatusResponse(BaseModel):
+    id: int
+    status: str
+    decision: str
+    reason: Optional[str] = None

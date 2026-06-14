@@ -1,43 +1,27 @@
-# schemas.py
-from pydantic import BaseModel, EmailStr, Field
-from datetime import datetime
+# app/api/schemas.py
+from pydantic import BaseModel
+from typing import List
 
-class CustomerCreate(BaseModel):
-    name: str
-    email: EmailStr
-    phone: str
-
-class CustomerOut(BaseModel):
-    id: int
-    name: str
-    email: EmailStr
-    phone: str
-    class Config:
-        orm_mode = True
-
-class LoanProductOut(BaseModel):
-    id: int
-    name: str
-    interest_rate: float
-    max_amount: float
-    class Config:
-        orm_mode = True
-
-class LoanApplicationCreate(BaseModel):
+class LoanApplicationCreateSchema(BaseModel):
     customer_id: int
     product_id: int
     amount: float
     income: float
     debt_ratio: float
+    credit_score: int
 
-class LoanApplicationOut(BaseModel):
-    id: int
-    customer_id: int
-    product_id: int
-    amount: float
-    income: float
-    debt_ratio: float
+class LoanApplicationUpdateSchema(BaseModel):
     status: str
-    created_at: datetime
-    class Config:
-        orm_mode = True
+    amount: float
+
+class LoanApplicationResponseSchema(BaseModel):
+    id: int
+    status: str
+    amount: float
+    created_at: str
+
+class LoanStatusResponseSchema(BaseModel):
+    id: int
+    status: str
+    decision: str
+    reason: str | None = None

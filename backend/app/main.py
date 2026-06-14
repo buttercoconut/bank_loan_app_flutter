@@ -1,15 +1,20 @@
-# main.py
+# app/main.py
 from fastapi import FastAPI
-from .api.routes import loan
-from .database import engine, Base
+from fastapi.middleware.cors import CORSMiddleware
+from app.api.routes.loan import router as loan_router
 
-# Create tables
-Base.metadata.create_all(bind=engine)
+app = FastAPI(title="Bank Loan API", version="1.0.0")
 
-app = FastAPI(title="Bank Loan Service API")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-app.include_router(loan.router)
+app.include_router(loan_router, prefix="/api/loans", tags=["loans"])
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to Bank Loan Service API"}
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}

@@ -1,12 +1,6 @@
 # main.py
-from fastapi import FastAPI
-from app.api.routes import loan
-from app.database import engine, Base
+import uvicorn
+from app.main import app
 
-app = FastAPI(title="Bank Loan Service API")
-
-# Create tables
-Base.metadata.create_all(bind=engine)
-
-# Include routers
-app.include_router(loan.router, prefix="/api/loan", tags=["loan"])
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
